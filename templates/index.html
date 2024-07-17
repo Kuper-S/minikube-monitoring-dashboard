@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MMD 🔎</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Minikube Monitoring Dashboard 🔎</h1>
+        <div class="metrics">
+            <div class="metric" id="cpu-metric" data-value="{{ cpu }}">
+                <h2>CPU Usage</h2>
+                <p>{{ cpu }}%</p>
+            </div>
+            <div class="metric" id="memory-metric" data-value="{{ memory }}">
+                <h2>Memory Usage</h2>
+                <p>{{ memory }}%</p>
+            </div>
+            <div class="metric" id="disk-metric" data-value="{{ disk }}">
+                <h2>Disk Usage</h2>
+                <p>{{ disk }}%</p>
+            </div>
+            <div class="metric">
+                <h2>Network Sent</h2>
+                <p>{{ net_sent }} bytes</p>
+            </div>
+            <div class="metric">
+                <h2>Network Received</h2>
+                <p>{{ net_recv }} bytes</p>
+            </div>
+            <div class="metric">
+                <h2>Total Nodes</h2>
+                <p>{{ nodes }}</p>
+            </div>
+            <div class="metric">
+                <h2>Total Pods</h2>
+                <p>{{ pods }}</p>
+            </div>
+        </div>
+
+        <h2>Pod Metrics</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Namespace</th>
+                    <th>CPU Usage</th>
+                    <th>Memory Usage</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pod in pod_metrics %}
+                <tr>
+                    <td>{{ pod.name }}</td>
+                    <td>{{ pod.namespace }}</td>
+                    <td class="metric-value" data-value="{{ pod.cpu }}">{{ pod.cpu }}</td>
+                    <td class="metric-value" data-value="{{ pod.memory }}">{{ pod.memory }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <h2>CPU Usage Chart</h2>
+        <canvas id="cpuChart"></canvas>
+        <script>
+            var ctx = document.getElementById('cpuChart').getContext('2d');
+            var cpuChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [/* timestamps or labels */],
+                    datasets: [{
+                        label: 'CPU Usage',
+                        data: [/* CPU usage data */],
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Function to set color based on value
+            function setColorBasedOnValue(element, value, thresholds) {
+                if (value < thresholds.green) {
+                    element.classList.add('green');
+                } else if (value < thresholds.red) {
+                    element.classList.add('orange');
+                } else {
+                    element.classList.add('red');
+                }
+            }
+
+            // Set color for metrics
+            var cpuElement = document.getElementById('cpu-metric');
+            var cpuValue = parseFloat(cpuElement.getAttribute('data-value'));
+            setColorBasedOnValue(cpuElement, cpuValue, {green: 50, red: 80});
+
+            var memoryElement = document.getElementById('memory-metric');
+            var memoryValue = parseFloat(memoryElement.getAttribute('data-value'));
+            setColorBasedOnValue(memoryElement, memoryValue, {green: 50, red: 80});
+
+            var diskElement = document.getElementById('disk-metric');
+            var diskValue = parseFloat(diskElement.getAttribute('data-value'));
+            setColorBasedOnValue(diskElement, diskValue, {green: 50, red: 80});
+
+            var podMetrics = document.querySelectorAll('td.metric-value');
+            podMetrics.forEach(function(metric) {
+                var value = parseFloat(metric.getAttribute('data-value'));
+                setColorBasedOnValue(metric, value, {green: 50, red: 80});
+            });
+        </script>
+    </div>
+</body>
+</html>

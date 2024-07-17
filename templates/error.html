@@ -1,0 +1,31 @@
+<!-- templates/error.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1 class="error-msg">Error</h1>
+        <p>{{ error_message }}</p>
+        <h3>Possible Causes</h3>
+        <ul>
+            <li>Check if the Minikube cluster is running: <code>minikube status</code></li>
+            <li>Ensure your kubeconfig is correctly configured and points to the correct cluster</li>
+            <li>Check network connectivity to the cluster's API server</li>
+            <li>Verify the metrics-server is running: <code>kubectl get apiservices | grep metrics</code></li>
+        </ul>
+        <h3>Next Steps</h3>
+        <ul>
+            <li>Restart Minikube: <code>minikube stop && minikube start</code></li>
+            <li>Update your kubeconfig: <code>minikube update-context</code></li>
+            <li>Review Kubernetes API server logs: <code>kubectl logs -n kube-system kube-apiserver-minikube</code></li>
+        </ul>
+        <h3>Technical Details</h3>
+        <pre>{{ error_details }}</pre>
+    </div>
+</body>
+</html>
